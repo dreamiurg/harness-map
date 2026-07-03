@@ -1,0 +1,8 @@
+{
+  "name": "harness-map-marketplace",
+  "description": "Visualize your AI harness architecture with an interactive dependency map of skills, commands, agents, and MCP servers",
+  "owner": { "name": "Dmytro Gaivoronsky" },
+  "plugins": [
+    { "name": "harness-map", "source": "./", "description": "Interactive dependency map of your AI harness" }
+  ]
+}
