@@ -87,16 +87,16 @@ function shade(name, key) {
     +(v[1] * window.__mapTweaks.chroma).toFixed(4)
   );
 }
-const baseClusterOrder = [
-  "Speckit",
-  "PR / Shipping",
-  "Release",
-  "QA / Browser",
-  "Legal",
-  "On-call / Data",
-  "Patrols",
-  "Support / Ops",
-];
+// Cluster order/grid come from the loaded graph, not a fixed taxonomy: this
+// renderer is shared across repos with arbitrary cluster names. Prefer the
+// order declared in data.clusters (author intent); fall back to whatever
+// cluster names actually appear on workflow nodes, for graphs that omit a
+// clusters array entirely.
+const baseClusterOrder = data.clusters.length
+  ? data.clusters.map((c) => c.name)
+  : [...new Set(data.nodes.filter(isWorkflow).map((n) => n.cluster))].filter(
+      Boolean
+    );
 let pos = structuredClone(data.positions);
 let clusters = structuredClone(data.clusters);
 let canvas = { width: 1600, height: 1100 };
@@ -282,12 +282,18 @@ function internalEdges(name) {
   );
   return currentEdges().filter((e) => ids.has(e.source) && ids.has(e.target));
 }
+const CLUSTER_ROW_SIZE = 3;
 function arrangeClusterBoxes(localLayouts) {
-  const rowDefs = [
-    ["Speckit", "PR / Shipping", "Release"],
-    ["QA / Browser", "Legal", "On-call / Data"],
-    ["Patrols", "Support / Ops"],
-  ];
+  // Pack clusters that actually have a layout into fixed-size rows, in
+  // baseClusterOrder order. Row width (3) matches the original hand-tuned
+  // grid's visual density; the row contents themselves are data-driven.
+  const namesWithLayout = baseClusterOrder.filter((name) =>
+    localLayouts.has(name)
+  );
+  const rowDefs = [];
+  for (let i = 0; i < namesWithLayout.length; i += CLUSTER_ROW_SIZE) {
+    rowDefs.push(namesWithLayout.slice(i, i + CLUSTER_ROW_SIZE));
+  }
   const den = window.__mapTweaks.density,
     gapX = 64 * den,
     gapY = 84 * den,

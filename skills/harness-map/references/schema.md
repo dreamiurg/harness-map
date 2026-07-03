@@ -53,6 +53,10 @@ The contract between the scanning script, the inferring agent, and the build scr
   (a command whose name matches a skill is folded into that skill's `commands[]` instead).
 - `history`/`contributors` may be `null` (non-git repo or lookup failure).
 - Agent-authored fields on every node: `summary` (required), `cluster` (optional string).
+  Workflow nodes left without a `cluster` are assigned to a synthesized `"Workflows"`
+  cluster by `build.mjs` (with a matching entry appended to `clusters`) so the renderer's
+  cluster-box layout has somewhere to place them — the agent does not need to invent
+  cluster names for a simple graph.
 - Kind-specific sub-objects (facts, from scan): `agent: {model?, targets?}` on agent nodes;
   `mcp: {name, type, command?, url?, argsSummary?}` on mcp nodes.
 

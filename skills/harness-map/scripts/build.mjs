@@ -31,7 +31,21 @@ for (const e of g.edges) {
   }
 }
 
-const data = { ...g, edgeTypes, stats, positions: {}, clusters: g.clusters || [] };
+// cluster is documented as optional per-node (schema.md), but the renderer's
+// cluster-box layout only positions nodes whose cluster matches a name in
+// `clusters`. Default ungrouped workflow nodes into a single "Workflows"
+// bucket so agent-authored graphs that skip clustering still render.
+const DEFAULT_CLUSTER = "Workflows";
+const nodes = g.nodes.map((n) =>
+  n.kind === "workflow" && !n.cluster ? { ...n, cluster: DEFAULT_CLUSTER } : n
+);
+const clusters = g.clusters && g.clusters.length ? g.clusters : (
+  nodes.some((n) => n.cluster === DEFAULT_CLUSTER)
+    ? [{ name: DEFAULT_CLUSTER, summary: "", members: [] }]
+    : []
+);
+
+const data = { ...g, nodes, edgeTypes, stats, positions: {}, clusters };
 
 // ----- assemble -----
 const b64 = (s) => Buffer.from(s, "utf8").toString("base64");
