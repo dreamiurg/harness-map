@@ -1,0 +1,4 @@
+node_modules/
+harness-map-work/
+*.local.*
+.DS_Store

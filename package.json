@@ -1,0 +1,11 @@
+{
+  "name": "harness-map",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Agent skill that generates an interactive dependency map of your AI harness",
+  "scripts": {
+    "test": "node --test tests/"
+  },
+  "engines": { "node": ">=20" }
+}
