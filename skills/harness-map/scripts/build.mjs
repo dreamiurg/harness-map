@@ -39,11 +39,22 @@ const DEFAULT_CLUSTER = "Workflows";
 const nodes = g.nodes.map((n) =>
   n.kind === "workflow" && !n.cluster ? { ...n, cluster: DEFAULT_CLUSTER } : n
 );
-const clusters = g.clusters && g.clusters.length ? g.clusters : (
-  nodes.some((n) => n.cluster === DEFAULT_CLUSTER)
-    ? [{ name: DEFAULT_CLUSTER, summary: "", members: [] }]
-    : []
-);
+
+// Reconcile deterministically: `clusters` is agent-authored and may drift from
+// the free-typed `node.cluster` values (typos, or a non-empty clusters array
+// that simply doesn't enumerate every cluster used by nodes). Rather than
+// trusting `clusters` to be complete, always append a synthetic entry for
+// every distinct workflow cluster name not already covered. This guarantees
+// `currentClusterNames()` in the renderer can never silently exclude a node
+// for want of a matching cluster entry.
+const declaredNames = new Set((g.clusters || []).map((c) => c.name));
+const usedNames = [
+  ...new Set(nodes.filter((n) => n.kind === "workflow").map((n) => n.cluster)),
+].sort();
+const synthesized = usedNames
+  .filter((name) => !declaredNames.has(name))
+  .map((name) => ({ name, summary: "", members: [] }));
+const clusters = [...(g.clusters || []), ...synthesized];
 
 const data = { ...g, nodes, edgeTypes, stats, positions: {}, clusters };
 

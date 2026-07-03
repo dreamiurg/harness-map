@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { readFileSync, mkdtempSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -29,4 +29,32 @@ test("build produces a self-contained html with data, renderer, vendor, and no p
   assert.equal(data.stats.edges, 3);
   assert.ok(data.edgeTypes.handoff, "edgeTypes injected");
   assert.deepEqual(data.positions, {});
+});
+
+test("build reconciles a non-empty clusters array that omits a used node.cluster value", () => {
+  // Regression for: a graph with clusters:[{name:"Alpha"}] plus a node whose
+  // cluster is "Beta-Typo" (drift/typo between the two free-typed fields).
+  // build.mjs must synthesize the missing cluster entry so the renderer's
+  // cluster-box layout has somewhere to place every node — nothing should be
+  // silently dropped for want of a matching `clusters` entry.
+  const dir = mkdtempSync(join(tmpdir(), "hm-build-reconcile-"));
+  const graphFile = join(dir, "graph.json");
+  const out = join(dir, "map.html");
+  const graph = {
+    schemaVersion: 1,
+    meta: { title: "reconcile-test", repoName: "reconcile-test", sourceUrlBase: "", generatedAt: "2026-07-03T00:00:00.000Z", generator: "harness-map@0.1.0" },
+    nodes: [
+      { id: "workflow:a", kind: "workflow", label: "a", path: "a.md", description: "", summary: "s", aliases: [], cluster: "Alpha", commands: [], history: null, contributors: null },
+      { id: "workflow:b", kind: "workflow", label: "b", path: "b.md", description: "", summary: "s", aliases: [], cluster: "Beta-Typo", commands: [], history: null, contributors: null },
+    ],
+    edges: [],
+    clusters: [{ name: "Alpha", summary: "", members: [] }],
+  };
+  writeFileSync(graphFile, JSON.stringify(graph));
+  execFileSync(process.execPath, [BUILD, "--graph", graphFile, "--out", out], { encoding: "utf8" });
+  const html = readFileSync(out, "utf8");
+  const dataJson = html.match(/window\.SkillDependencyMapData\s*=\s*(\{[\s\S]*?\});\s*\n/)[1];
+  const data = JSON.parse(dataJson);
+  const names = data.clusters.map((c) => c.name).sort();
+  assert.deepEqual(names, ["Alpha", "Beta-Typo"], "clusters array must cover every distinct node.cluster value");
 });

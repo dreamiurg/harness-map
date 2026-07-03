@@ -56,7 +56,12 @@ The contract between the scanning script, the inferring agent, and the build scr
   Workflow nodes left without a `cluster` are assigned to a synthesized `"Workflows"`
   cluster by `build.mjs` (with a matching entry appended to `clusters`) so the renderer's
   cluster-box layout has somewhere to place them — the agent does not need to invent
-  cluster names for a simple graph.
+  cluster names for a simple graph. More generally, `build.mjs` reconciles `clusters`
+  against every distinct `node.cluster` value actually used: any name present on a
+  workflow node but missing from (or typo'd relative to) the authored `clusters` array
+  gets a synthetic entry appended automatically. This is deterministic and unconditional —
+  authors never need to keep `clusters` in sync with node-level `cluster` values by hand,
+  and the renderer can assume `clusters` always covers every node.
 - Kind-specific sub-objects (facts, from scan): `agent: {model?, targets?}` on agent nodes;
   `mcp: {name, type, command?, url?, argsSummary?}` on mcp nodes.
 

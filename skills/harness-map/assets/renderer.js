@@ -49,18 +49,20 @@ window.__applyMapTweaks = (t) => {
 };
 const nodeById = new Map(data.nodes.map((n) => [n.id, n]));
 const clusterByName = new Map(data.clusters.map((c) => [c.name, c]));
-const clusterHues = new Map([
-  ["Speckit", 285],
-  ["PR / Shipping", 155],
-  ["Release", 115],
-  ["QA / Browser", 215],
-  ["Legal", 55],
-  ["On-call / Data", 15],
-  ["Patrols", 330],
-  ["Support / Ops", 180],
-]);
+// Cluster names are arbitrary per-repo (agent-authored), so hues can't be a
+// fixed lookup table. Derive a stable hue from the name itself: a simple
+// string hash mapped into 0-359 gives every repo's clusters a consistent,
+// distinct-ish color across runs without hardcoding any repo's taxonomy.
+function clusterHue(name) {
+  let h = 0;
+  const s = String(name ?? "");
+  for (let i = 0; i < s.length; i++) {
+    h = (h * 31 + s.charCodeAt(i)) | 0;
+  }
+  return Math.abs(h) % 360;
+}
 function clusterColor(name, l, c) {
-  const h = clusterHues.get(name) ?? 220;
+  const h = name ? clusterHue(name) : 220;
   return `oklch(${l} ${c} ${h})`;
 }
 const clusterShades = {
@@ -1204,7 +1206,14 @@ function render() {
   svg.appendChild(nodeLayer);
   for (const n of currentNodes()) {
     const p = pos[n.id];
-    if (!p) continue;
+    if (!p) {
+      // Last-resort guard: build.mjs reconciles `clusters` to cover every
+      // node.cluster value, so this should be unreachable in practice. If it
+      // fires, a node was silently dropped from the map instead of failing
+      // loudly — warn with the node id so the gap is diagnosable.
+      console.warn(`harness-map: node "${n.id}" has no computed position and was skipped`);
+      continue;
+    }
     const match = nodeMatchesSearch(n, q);
     const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
     g.setAttribute(
