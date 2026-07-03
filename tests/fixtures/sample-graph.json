@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "meta": {
+    "title": "mini-repo Harness Map",
+    "repoName": "mini-repo",
+    "sourceUrlBase": "",
+    "generatedAt": "2026-07-03T00:00:00.000Z",
+    "generator": "harness-map@0.1.0"
+  },
+  "nodes": [
+    { "id": "workflow:alpha", "kind": "workflow", "label": "alpha", "path": ".claude/skills/alpha/SKILL.md", "description": "d", "summary": "Runs alpha then hands to beta.", "aliases": [], "commands": [], "history": null, "contributors": null },
+    { "id": "workflow:beta", "kind": "workflow", "label": "beta", "path": ".claude/skills/beta.md", "description": "d", "summary": "Flat skill.", "aliases": [], "commands": [], "history": null, "contributors": null },
+    { "id": "agent:helper", "kind": "agent", "label": "helper", "path": ".claude/agents/helper.md", "description": "d", "summary": "Reviewer agent.", "aliases": [], "commands": [], "history": null, "contributors": null, "agent": { "model": "sonnet", "targets": ["claude"] } },
+    { "id": "mcp:thing", "kind": "mcp", "label": "thing", "path": ".mcp.json", "description": "", "summary": "Thing MCP server.", "aliases": [], "commands": [], "history": null, "contributors": null, "mcp": { "name": "thing", "type": "stdio", "command": "uvx", "url": null, "argsSummary": "thing-mcp==1.0.0" } }
+  ],
+  "edges": [
+    { "source": "workflow:alpha", "target": "workflow:beta", "kind": "handoff", "evidence": [".claude/skills/alpha/SKILL.md"], "weight": 1 },
+    { "source": "workflow:alpha", "target": "agent:helper", "kind": "delegates", "evidence": [".claude/skills/alpha/SKILL.md"], "weight": 1 },
+    { "source": "workflow:alpha", "target": "mcp:thing", "kind": "uses-mcp", "evidence": [".claude/skills/alpha/SKILL.md"], "weight": 1 }
+  ],
+  "clusters": []
+}
