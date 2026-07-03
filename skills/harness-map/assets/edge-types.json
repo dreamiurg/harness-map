@@ -1,0 +1,108 @@
+{
+  "uses": {
+    "category": "dependency",
+    "markerCategory": "default",
+    "outLabel": "depends on",
+    "inLabel": "used by",
+    "countAs": []
+  },
+  "handoff": {
+    "category": "handoff",
+    "markerCategory": "handoff",
+    "outLabel": "depends on",
+    "inLabel": "used by",
+    "countAs": []
+  },
+  "uses-mcp": {
+    "category": "mcp",
+    "markerCategory": "mcp",
+    "inlineLabel": "uses",
+    "outLabel": "uses MCP",
+    "inLabel": "used by",
+    "countAs": [
+      "mcp"
+    ]
+  },
+  "delegates": {
+    "category": "agent",
+    "markerCategory": "agent",
+    "inlineLabel": "delegates",
+    "outLabel": "delegates to",
+    "inLabel": "delegated from",
+    "countAs": [
+      "agent"
+    ]
+  },
+  "references-skill": {
+    "category": "agent",
+    "markerCategory": "agent",
+    "inlineLabel": "agent",
+    "outLabel": "references skill",
+    "inLabel": "referenced by agent",
+    "countAs": [
+      "agent"
+    ]
+  },
+  "uses-agent": {
+    "category": "agent",
+    "markerCategory": "agent",
+    "inlineLabel": "agent",
+    "outLabel": "uses agent",
+    "inLabel": "used by skill",
+    "countAs": [
+      "agent"
+    ]
+  },
+  "uses-prompt": {
+    "category": "prompt",
+    "markerCategory": "prompt",
+    "inlineLabel": "prompt",
+    "outLabel": "uses prompt",
+    "inLabel": "used by",
+    "countAs": [
+      "prompt"
+    ]
+  },
+  "references-prompt": {
+    "category": "prompt",
+    "markerCategory": "prompt",
+    "inlineLabel": "prompt",
+    "outLabel": "references prompt",
+    "inLabel": "referenced by",
+    "countAs": [
+      "prompt"
+    ]
+  },
+  "prompt-uses-agent": {
+    "category": "prompt",
+    "markerCategory": "prompt",
+    "inlineLabel": "prompt",
+    "outLabel": "uses agent",
+    "inLabel": "used by prompt",
+    "countAs": [
+      "prompt",
+      "agent"
+    ]
+  },
+  "prompt-uses-mcp": {
+    "category": "prompt",
+    "markerCategory": "mcp",
+    "inlineLabel": "uses",
+    "outLabel": "uses MCP",
+    "inLabel": "used by prompt",
+    "countAs": [
+      "prompt",
+      "mcp"
+    ]
+  },
+  "prompt-references-skill": {
+    "category": "prompt",
+    "markerCategory": "prompt",
+    "inlineLabel": "prompt",
+    "outLabel": "references skill",
+    "inLabel": "referenced by prompt",
+    "countAs": [
+      "prompt"
+    ]
+  }
+}
