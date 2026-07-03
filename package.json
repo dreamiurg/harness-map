@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Agent skill that generates an interactive dependency map of your AI harness",
   "scripts": {
-    "test": "node --test tests/"
+    "test": "node --test tests/*.test.mjs"
   },
   "engines": { "node": ">=20" }
 }

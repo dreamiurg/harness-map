@@ -1,0 +1,6 @@
+{
+  "mcpServers": {
+    "thing": { "type": "stdio", "command": "uvx", "args": ["thing-mcp==1.0.0"] },
+    "remote": { "type": "http", "url": "https://example.com/mcp" }
+  }
+}
