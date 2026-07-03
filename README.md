@@ -4,6 +4,11 @@ An [Agent Skill](https://agentskills.io) that generates a **self-contained, inte
 dependency map** of a repository's AI harness: skills, commands, agents, and MCP servers —
 which skills hand off to which, which agents they delegate to, which MCP servers everything uses.
 
+![Example: comms-center harness map](examples/comms-center.png)
+
+*(Generated from a real repo — 8 skills, 10 agents, 10 MCP servers, 36 evidence-backed edges.
+Interactive version: [examples/comms-center.html](examples/comms-center.html).)*
+
 Deterministic scripts scan the repo and build the HTML; the invoking agent does the one thing
 scripts can't — reading each skill/agent body and inferring typed, evidence-backed dependency edges.
 
