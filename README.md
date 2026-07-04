@@ -34,6 +34,28 @@ Or as a Claude Code plugin:
 Ask your agent: "map my AI harness" or invoke `/harness-map`. Output: `harness-map.html`
 (single file, fully offline, open in any browser).
 
+## Quickstart for agents
+
+If you are a coding agent (Claude Code, Codex, Cursor, ...) whose human asked you to set
+this up, do this — verified to work on a clean machine with only Node ≥ 20 and git:
+
+1. From the root of the repository you want to map:
+
+       npx -y skills add dreamiurg/harness-map -y
+
+   The CLI detects agent environments and runs non-interactively. The skill lands in
+   `.agents/skills/harness-map/`.
+
+2. Generate the map now — do not wait for a new session to pick the skill up. Read
+   `.agents/skills/harness-map/SKILL.md` and execute its four phases directly:
+   **scan** (run the script) → **infer edges** (your judgment; every edge needs a quotable
+   line of evidence) → **validate** (run the script, fix `graph.json` until it prints `OK`)
+   → **build** (run the script).
+
+3. Report to your human: the path to `harness-map.html`, node/edge counts, and 2–3
+   notable findings (orphan skills, the most-depended-on agent, unused MCP servers).
+   Delete `harness-map-work/` or gitignore it — only the HTML is the deliverable.
+
 ## License
 
 MIT
