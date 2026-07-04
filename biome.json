@@ -1,8 +1,18 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.5.2/schema.json",
-  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
   "files": {
-    "includes": ["**", "!skills/harness-map/assets", "!examples", "!tests/fixtures"]
+    "includes": [
+      "**",
+      "!skills/harness-map/assets",
+      "!examples",
+      "!tests/fixtures",
+      "!.claude-plugin"
+    ]
   },
   "formatter": {
     "indentStyle": "space",
@@ -16,7 +26,9 @@
       "complexity": {
         "noExcessiveCognitiveComplexity": {
           "level": "error",
-          "options": { "maxAllowedComplexity": 15 }
+          "options": {
+            "maxAllowedComplexity": 15
+          }
         }
       }
     }
