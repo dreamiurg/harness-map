@@ -2,7 +2,7 @@
 // scan.mjs — deterministic discovery of AI-harness surfaces.
 // Usage: node scan.mjs --repo <path> --out <dir>
 import { execFileSync } from "node:child_process";
-import { readFileSync, readdirSync, existsSync, mkdirSync, writeFileSync, statSync } from "node:fs";
+import { readFileSync, readdirSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join, resolve, basename } from "node:path";
 
 // ---------- CLI ----------
@@ -134,6 +134,7 @@ function walkCommands(rel) {
       const skill = skillByName.get(name);
       if (skill) {
         nodes.find((n) => n.id === skill.id).commands.push(cmd);
+        readList.push(childRel);
       } else {
         addNode({ id: `workflow:${name}`, kind: "workflow", label: name, path: childRel, description: cmd.description, commands: [cmd] }, childRel);
         skillByName.set(name, { id: `workflow:${name}` });
