@@ -56,6 +56,7 @@ test("readList covers every skill, agent, and command file", () => {
     ".claude/skills/beta.md",
     ".claude/agents/helper.md",
     ".claude/commands/deploy.md",
+    ".claude/commands/alpha.md",
   ]) assert.ok(scan.readList.includes(p), `missing ${p}`);
 });
 
