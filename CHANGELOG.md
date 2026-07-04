@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/dreamiurg/harness-map/compare/harness-map-v1.1.0...harness-map-v1.1.1) (2026-07-04)
+
+
+### Bug Fixes
+
+* **security:** verifiable vendor provenance, prompt-injection guard, security docs ([#8](https://github.com/dreamiurg/harness-map/issues/8)) ([f95f0cf](https://github.com/dreamiurg/harness-map/commit/f95f0cf534303e757fd128691c444e68d2f70fb0))
+
 ## [1.1.0](https://github.com/dreamiurg/harness-map/compare/harness-map-v0.1.0...harness-map-v1.1.0) (2026-07-04)
 
 
