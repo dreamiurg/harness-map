@@ -4,10 +4,11 @@ An [Agent Skill](https://agentskills.io) that generates a **self-contained, inte
 dependency map** of a repository's AI harness: skills, commands, agents, and MCP servers —
 which skills hand off to which, which agents they delegate to, which MCP servers everything uses.
 
-![Example: comms-center harness map](examples/comms-center.png)
+![Example: superpowers harness map](examples/superpowers.png)
 
-*(Generated from a real repo — 8 skills, 10 agents, 10 MCP servers, 36 evidence-backed edges.
-Interactive version: [examples/comms-center.html](examples/comms-center.html).)*
+*(Generated from the public [obra/superpowers](https://github.com/obra/superpowers) repo —
+14 skills, 22 evidence-backed edges, auto-clustered.
+Interactive version: [examples/superpowers.html](examples/superpowers.html).)*
 
 Deterministic scripts scan the repo and build the HTML; the invoking agent does the one thing
 scripts can't — reading each skill/agent body and inferring typed, evidence-backed dependency edges.
@@ -26,6 +27,6 @@ Or as a Claude Code plugin:
 Ask your agent: "map my AI harness" or invoke `/harness-map`. Output: `harness-map.html`
 (single file, fully offline, open in any browser).
 
-## Status
+## License
 
-Pre-release. Private while under development.
+MIT
