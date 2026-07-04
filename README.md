@@ -21,6 +21,9 @@ scripts can't — reading each skill/agent body and inferring typed, evidence-ba
 
     npx skills add dreamiurg/harness-map
 
+This installs the skill to `.agents/skills/harness-map/` in your project — the shared
+location read by Claude Code, Codex, Cursor, and other Agent-Skills-compatible tools.
+
 Or as a Claude Code plugin:
 
     /plugin marketplace add dreamiurg/harness-map

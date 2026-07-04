@@ -43,10 +43,7 @@ jobs:
         uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac # v5
         with:
           files: coverage/lcov.info
-          token: ${{ secrets.CODECOV_TOKEN }}
-          # Coverage is already enforced by c8 thresholds above; flip this to true
-          # once CODECOV_TOKEN is configured (or the repo goes public).
-          fail_ci_if_error: false
+          fail_ci_if_error: true
 
   sast:
     name: SAST
