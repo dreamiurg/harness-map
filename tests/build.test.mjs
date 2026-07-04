@@ -20,6 +20,7 @@ test("build produces a self-contained html with data, renderer, vendor, and no p
   assert.match(html, /window\.SkillDependencyMapAvatarResources\s*=/);
   assert.match(html, /mini-repo Harness Map/);
   assert.doesNotMatch(html, /<script\s+src="(?!data:)/, "no external script srcs");
+  assert.match(html, /class="attribution".*github\.com\/dreamiurg\/harness-map/, "attribution footer present");
 
   const dataJson = html.match(/window\.SkillDependencyMapData\s*=\s*(\{[\s\S]*?\});\s*\n/)[1];
   const data = JSON.parse(dataJson);

@@ -54,6 +54,9 @@
 html[data-theme="light"]{--bg:#f4f6f9;--glass:rgba(255,255,255,.92);--ink:#1c2530;--muted:#5c6879;--line:#dbe2ec;--node:#ffffff;--node-line:#b6c2d1;--mcp:#eef6ff;--mcp-line:#2563eb;--agent:#fff7ed;--agent-line:#ea580c;--prompt:#faf5ff;--prompt-line:#9333ea;--edge:#8494a9;--handoff:#7c3aed;--active:#d97706;--accent:#0969da;--accent-soft:rgba(9,105,218,.1);--accent-line:rgba(9,105,218,.3);--accent-strong:#0b4f9e;--field:#ffffff;--btn:#ffffff;--btn-hover:#eef2f8;--btn-ink:#37424f;--btn-line-hover:#a9b8c9;--dots:#d8dfe9;--wash:#eef1f6;--node-text:#18202b;--alias:#8d99ab;--edge-label:#5f7494;--panel:rgba(255,255,255,.95);--panel-shadow:rgba(15,23,42,.14);--node-shadow:rgba(15,23,42,.12);--card:#f8fafc;--code-bg:#eef2f7;--code-ink:#0b56a8;--summary-ink:#3a4654;--key-ink:#5c6879;--faint:#95a1b2;--seg-ink:#5c6879;--arrow-default:#8494a9;--scroll:#c9d2de;--avatar-line:#d4dce6}
 *{box-sizing:border-box}
 body{margin:0;height:100vh;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.attribution{position:fixed;left:12px;bottom:10px;z-index:4;padding:4px 10px;border:1px solid var(--line);border-radius:8px;background:var(--glass);backdrop-filter:blur(10px);color:var(--muted);font-size:11px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.attribution a{color:var(--accent);text-decoration:none}
+.attribution a:hover{text-decoration:underline}
 header{flex:none;z-index:5;background:var(--glass);border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
 .wrap{width:100%;padding:12px 18px}
 h1{margin:0 0 3px;font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:21px;font-weight:600;letter-spacing:.01em;line-height:1.15}
@@ -183,6 +186,7 @@ a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
 </div>
 </div></header>
 <main><div id="graphWrap"><svg id="graph" viewBox="0 0 1600 1100" role="img" aria-label="Clustered skill dependency graph"></svg></div><aside class="detailPanel"><button type="button" id="panelToggle" class="panelTab" aria-label="Toggle details panel" aria-expanded="true">›</button><h2>Selection</h2><div id="details"><p class="muted">Click a skill, agent, prompt, or MCP server to inspect summaries, contributors, and dependencies. Click a cluster box to inspect its member items.</p></div></aside></main>
+<footer class="attribution">Generated with <a href="https://github.com/dreamiurg/harness-map" target="_blank" rel="noopener">harness-map</a> by dreamiurg</footer>
 <!-- Graph facts live in the data file; drawing and interactions live in the renderer. -->
 <!--HM:DATA-->
 <!--HM:RENDERER-->
