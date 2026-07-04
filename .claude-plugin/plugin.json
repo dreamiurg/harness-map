@@ -1,7 +1,7 @@
 {
   "name": "harness-map",
   "description": "Generate an interactive dependency map of your AI harness (skills, commands, agents, MCP servers)",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "author": {
     "name": "Dmytro Gaivoronsky",
     "url": "https://github.com/dreamiurg"
