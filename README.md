@@ -1,4 +1,8 @@
 # harness-map
+[![CI](https://github.com/dreamiurg/harness-map/actions/workflows/ci.yml/badge.svg)](https://github.com/dreamiurg/harness-map/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/dreamiurg/harness-map/graph/badge.svg)](https://codecov.io/gh/dreamiurg/harness-map)
+[![Node](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](package.json)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 An [Agent Skill](https://agentskills.io) that generates a **self-contained, interactive HTML
 dependency map** of a repository's AI harness: skills, commands, agents, and MCP servers —

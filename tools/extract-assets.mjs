@@ -13,7 +13,7 @@
 // `<script src="data:application/javascript;base64,...">` tags. The classifier
 // below was rewritten around that reality; the four-placeholder template
 // contract and separate renderer.js/edge-types.json outputs are unchanged.
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 const SRC = "/Users/dreamiurg/src/calle/calle/.coding-agents-config";
@@ -56,10 +56,7 @@ template = template.replace(/<title>[\s\S]*?<\/title>/, "<title><!--HM:TITLE--><
 //    covers the <title> tag, not body copy. The renderer sets these from
 //    data.meta.title at runtime (see Step 5 guard below), so static fallback
 //    copy here just needs to be neutral, not repo-specific.
-template = template.replace(
-  /<h1>Call-E Skill Dependency Map<\/h1>/,
-  "<h1>Harness Map</h1>",
-);
+template = template.replace(/<h1>Call-E Skill Dependency Map<\/h1>/, "<h1>Harness Map</h1>");
 template = template.replace(
   /<div class="sub">[^<]*<\/div>/,
   '<div class="sub">How skills, commands, agents, and MCP servers connect in this repo.</div>',
@@ -75,8 +72,16 @@ writeFileSync(join(OUT, "edge-types.json"), JSON.stringify(data.edgeTypes, null,
 writeFileSync(join(OUT, "template.html"), template);
 writeFileSync(join(OUT, "renderer.js"), renderer);
 
-console.log(JSON.stringify({
-  vendorCount, sawData, sawRenderer,
-  templateBytes: template.length,
-  edgeKinds: Object.keys(data.edgeTypes),
-}, null, 2));
+console.log(
+  JSON.stringify(
+    {
+      vendorCount,
+      sawData,
+      sawRenderer,
+      templateBytes: template.length,
+      edgeKinds: Object.keys(data.edgeTypes),
+    },
+    null,
+    2,
+  ),
+);

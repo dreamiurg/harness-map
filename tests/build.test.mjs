@@ -1,9 +1,9 @@
-import { test } from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { readFileSync, writeFileSync, mkdtempSync } from "node:fs";
+import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, dirname } from "node:path";
+import { dirname, join } from "node:path";
+import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -20,7 +20,11 @@ test("build produces a self-contained html with data, renderer, vendor, and no p
   assert.match(html, /window\.SkillDependencyMapAvatarResources\s*=/);
   assert.match(html, /mini-repo Harness Map/);
   assert.doesNotMatch(html, /<script\s+src="(?!data:)/, "no external script srcs");
-  assert.match(html, /class="attribution".*github\.com\/dreamiurg\/harness-map/, "attribution footer present");
+  assert.match(
+    html,
+    /class="attribution".*github\.com\/dreamiurg\/harness-map/,
+    "attribution footer present",
+  );
 
   const dataJson = html.match(/window\.SkillDependencyMapData\s*=\s*(\{[\s\S]*?\});\s*\n/)[1];
   const data = JSON.parse(dataJson);
@@ -43,10 +47,40 @@ test("build reconciles a non-empty clusters array that omits a used node.cluster
   const out = join(dir, "map.html");
   const graph = {
     schemaVersion: 1,
-    meta: { title: "reconcile-test", repoName: "reconcile-test", sourceUrlBase: "", generatedAt: "2026-07-03T00:00:00.000Z", generator: "harness-map@0.1.0" },
+    meta: {
+      title: "reconcile-test",
+      repoName: "reconcile-test",
+      sourceUrlBase: "",
+      generatedAt: "2026-07-03T00:00:00.000Z",
+      generator: "harness-map@0.1.0",
+    },
     nodes: [
-      { id: "workflow:a", kind: "workflow", label: "a", path: "a.md", description: "", summary: "s", aliases: [], cluster: "Alpha", commands: [], history: null, contributors: null },
-      { id: "workflow:b", kind: "workflow", label: "b", path: "b.md", description: "", summary: "s", aliases: [], cluster: "Beta-Typo", commands: [], history: null, contributors: null },
+      {
+        id: "workflow:a",
+        kind: "workflow",
+        label: "a",
+        path: "a.md",
+        description: "",
+        summary: "s",
+        aliases: [],
+        cluster: "Alpha",
+        commands: [],
+        history: null,
+        contributors: null,
+      },
+      {
+        id: "workflow:b",
+        kind: "workflow",
+        label: "b",
+        path: "b.md",
+        description: "",
+        summary: "s",
+        aliases: [],
+        cluster: "Beta-Typo",
+        commands: [],
+        history: null,
+        contributors: null,
+      },
     ],
     edges: [],
     clusters: [{ name: "Alpha", summary: "", members: [] }],
@@ -57,5 +91,9 @@ test("build reconciles a non-empty clusters array that omits a used node.cluster
   const dataJson = html.match(/window\.SkillDependencyMapData\s*=\s*(\{[\s\S]*?\});\s*\n/)[1];
   const data = JSON.parse(dataJson);
   const names = data.clusters.map((c) => c.name).sort();
-  assert.deepEqual(names, ["Alpha", "Beta-Typo"], "clusters array must cover every distinct node.cluster value");
+  assert.deepEqual(
+    names,
+    ["Alpha", "Beta-Typo"],
+    "clusters array must cover every distinct node.cluster value",
+  );
 });

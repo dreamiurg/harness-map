@@ -2,8 +2,8 @@
 // scan.mjs — deterministic discovery of AI-harness surfaces.
 // Usage: node scan.mjs --repo <path> --out <dir>
 import { execFileSync } from "node:child_process";
-import { readFileSync, readdirSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
-import { join, resolve, basename } from "node:path";
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { basename, join, resolve } from "node:path";
 
 // ---------- CLI ----------
 const argv = process.argv.slice(2);
@@ -43,7 +43,10 @@ export function parseFrontmatter(text) {
 }
 
 function git(...a) {
-  return execFileSync("git", ["-C", repo, ...a], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
+  return execFileSync("git", ["-C", repo, ...a], {
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "ignore"],
+  });
 }
 
 function gitHistory(relPath) {
@@ -62,7 +65,14 @@ function gitHistory(relPath) {
     const last = rows[0][1];
     const ageDays = Math.round((Date.now() - new Date(first).getTime()) / 86400000);
     return {
-      history: { sourceFiles: [relPath], totalChanges: rows.length, uniqueCommits: rows.length, firstCommit: first, lastUpdated: last, ageDays },
+      history: {
+        sourceFiles: [relPath],
+        totalChanges: rows.length,
+        uniqueCommits: rows.length,
+        firstCommit: first,
+        lastUpdated: last,
+        ageDays,
+      },
       contributors: [...byAuthor.values()].sort((a, b) => b.changes - a.changes),
     };
   } catch {
@@ -75,7 +85,9 @@ function detectRemote() {
     const url = git("remote", "get-url", "origin").trim();
     const m = url.match(/github\.com[:/]([^/]+)\/(.+?)(\.git)?$/);
     let branch = "main";
-    try { branch = git("rev-parse", "--abbrev-ref", "HEAD").trim(); } catch {}
+    try {
+      branch = git("rev-parse", "--abbrev-ref", "HEAD").trim();
+    } catch {}
     if (m) return `https://github.com/${m[1]}/${m[2]}/blob/${branch}/`;
   } catch {}
   return "";
@@ -85,7 +97,11 @@ function read(rel) {
   return readFileSync(join(repo, rel), "utf8");
 }
 function listDir(rel) {
-  try { return readdirSync(join(repo, rel), { withFileTypes: true }); } catch { return []; }
+  try {
+    return readdirSync(join(repo, rel), { withFileTypes: true });
+  } catch {
+    return [];
+  }
 }
 
 // ---------- discovery ----------
@@ -102,7 +118,8 @@ const SKILL_DIRS = [".claude/skills", "skills", ".agents/skills"];
 const skillByName = new Map();
 for (const dir of SKILL_DIRS) {
   for (const ent of listDir(dir)) {
-    let rel = null, name = null;
+    let rel = null,
+      name = null;
     if (ent.isDirectory() && existsSync(join(repo, dir, ent.name, "SKILL.md"))) {
       rel = `${dir}/${ent.name}/SKILL.md`;
       name = ent.name;
@@ -113,7 +130,10 @@ for (const dir of SKILL_DIRS) {
     if (!rel || skillByName.has(name)) continue;
     const { attrs } = parseFrontmatter(read(rel));
     const node = {
-      id: `workflow:${name}`, kind: "workflow", label: name, path: rel,
+      id: `workflow:${name}`,
+      kind: "workflow",
+      label: name,
+      path: rel,
       description: attrs.description || "",
     };
     skillByName.set(name, node);
@@ -136,7 +156,17 @@ function walkCommands(rel) {
         nodes.find((n) => n.id === skill.id).commands.push(cmd);
         readList.push(childRel);
       } else {
-        addNode({ id: `workflow:${name}`, kind: "workflow", label: name, path: childRel, description: cmd.description, commands: [cmd] }, childRel);
+        addNode(
+          {
+            id: `workflow:${name}`,
+            kind: "workflow",
+            label: name,
+            path: childRel,
+            description: cmd.description,
+            commands: [cmd],
+          },
+          childRel,
+        );
         skillByName.set(name, { id: `workflow:${name}` });
         readList.push(childRel);
       }
@@ -151,28 +181,44 @@ for (const ent of listDir(".claude/agents")) {
   const rel = `.claude/agents/${ent.name}`;
   const name = basename(ent.name, ".md");
   const { attrs } = parseFrontmatter(read(rel));
-  addNode({
-    id: `agent:${name}`, kind: "agent", label: name, path: rel,
-    description: attrs.description || "",
-    agent: { model: attrs.model || null, targets: ["claude"] },
-  }, rel);
+  addNode(
+    {
+      id: `agent:${name}`,
+      kind: "agent",
+      label: name,
+      path: rel,
+      description: attrs.description || "",
+      agent: { model: attrs.model || null, targets: ["claude"] },
+    },
+    rel,
+  );
   readList.push(rel);
 }
 
 // MCP servers: .mcp.json
 if (existsSync(join(repo, ".mcp.json"))) {
   let servers = {};
-  try { servers = JSON.parse(read(".mcp.json")).mcpServers || {}; } catch {}
+  try {
+    servers = JSON.parse(read(".mcp.json")).mcpServers || {};
+  } catch {}
   for (const [name, cfg] of Object.entries(servers)) {
-    addNode({
-      id: `mcp:${name}`, kind: "mcp", label: name, path: ".mcp.json",
-      description: "",
-      mcp: {
-        name, type: cfg.type || (cfg.url ? "http" : "stdio"),
-        command: cfg.command || null, url: cfg.url || null,
-        argsSummary: Array.isArray(cfg.args) ? cfg.args.join(" ") : null,
+    addNode(
+      {
+        id: `mcp:${name}`,
+        kind: "mcp",
+        label: name,
+        path: ".mcp.json",
+        description: "",
+        mcp: {
+          name,
+          type: cfg.type || (cfg.url ? "http" : "stdio"),
+          command: cfg.command || null,
+          url: cfg.url || null,
+          argsSummary: Array.isArray(cfg.args) ? cfg.args.join(" ") : null,
+        },
       },
-    }, ".mcp.json");
+      ".mcp.json",
+    );
   }
 }
 
@@ -190,4 +236,6 @@ const scan = {
   readList,
 };
 writeFileSync(join(outDir, "scan.json"), JSON.stringify(scan, null, 2) + "\n");
-console.log(`scan.json: ${nodes.length} nodes (${nodes.filter(n=>n.kind==="workflow").length} workflows, ${nodes.filter(n=>n.kind==="agent").length} agents, ${nodes.filter(n=>n.kind==="mcp").length} mcp), ${readList.length} files to read -> ${join(outDir, "scan.json")}`);
+console.log(
+  `scan.json: ${nodes.length} nodes (${nodes.filter((n) => n.kind === "workflow").length} workflows, ${nodes.filter((n) => n.kind === "agent").length} agents, ${nodes.filter((n) => n.kind === "mcp").length} mcp), ${readList.length} files to read -> ${join(outDir, "scan.json")}`,
+);

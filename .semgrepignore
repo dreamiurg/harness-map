@@ -1,0 +1,7 @@
+skills/harness-map/assets/vendor/
+skills/harness-map/assets/renderer.js
+skills/harness-map/assets/template.html
+examples/
+tests/fixtures/
+coverage/
+node_modules/
