@@ -1,12 +1,15 @@
 #!/usr/bin/env node
 // validate.mjs — fail-closed checks on an agent-authored graph.json.
 // Usage: node validate.mjs --graph <file> --repo <path>
-import { readFileSync, existsSync } from "node:fs";
-import { join, resolve, dirname } from "node:path";
+import { existsSync, readFileSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const argv = process.argv.slice(2);
-const arg = (n, f) => { const i = argv.indexOf(n); return i === -1 ? f : argv[i + 1]; };
+const arg = (n, f) => {
+  const i = argv.indexOf(n);
+  return i === -1 ? f : argv[i + 1];
+};
 const graphFile = resolve(arg("--graph", "harness-map-work/graph.json"));
 const repo = resolve(arg("--repo", "."));
 
@@ -41,7 +44,8 @@ for (const n of g.nodes || []) {
   if (!n.label) err(`${n.id}: label is required`);
   if (!n.path) err(`${n.id}: path is required`);
   else if (!existsSync(join(repo, n.path))) err(`${n.id}: path does not exist in repo: ${n.path}`);
-  if (typeof n.summary !== "string" || n.summary.trim().length < 3) err(`${n.id}: summary (agent-written one-liner) is required`);
+  if (typeof n.summary !== "string" || n.summary.trim().length < 3)
+    err(`${n.id}: summary (agent-written one-liner) is required`);
 }
 
 const seenEdges = new Set();
@@ -49,10 +53,12 @@ for (const e of g.edges || []) {
   const tag = `${e.source} -[${e.kind}]-> ${e.target}`;
   if (!ids.has(e.source)) err(`edge ${tag}: unknown source`);
   if (!ids.has(e.target)) err(`edge ${tag}: unknown target ${e.target}`);
-  if (!edgeTypes[e.kind]) err(`edge ${tag}: unknown kind "${e.kind}" (see references/edge-taxonomy.md)`);
+  if (!edgeTypes[e.kind])
+    err(`edge ${tag}: unknown kind "${e.kind}" (see references/edge-taxonomy.md)`);
   if (seenEdges.has(tag)) err(`edge ${tag}: duplicate (raise weight instead)`);
   seenEdges.add(tag);
-  if (!Array.isArray(e.evidence) || e.evidence.length === 0) err(`edge ${tag}: evidence[] required`);
+  if (!Array.isArray(e.evidence) || e.evidence.length === 0)
+    err(`edge ${tag}: evidence[] required`);
   for (const p of e.evidence || [])
     if (!existsSync(join(repo, p))) err(`edge ${tag}: evidence path does not exist: ${p}`);
 }
@@ -68,4 +74,6 @@ if (errors.length) {
   console.error(`\n${errors.length} error(s). Fix graph.json and re-run.`);
   process.exit(1);
 }
-console.log(`OK: ${g.nodes.length} nodes, ${g.edges.length} edges, ${(g.clusters || []).length} clusters`);
+console.log(
+  `OK: ${g.nodes.length} nodes, ${g.edges.length} edges, ${(g.clusters || []).length} clusters`,
+);

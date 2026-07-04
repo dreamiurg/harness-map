@@ -1,0 +1,44 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: ^(skills/harness-map/assets/|examples/)
+      - id: end-of-file-fixer
+        exclude: ^(skills/harness-map/assets/|examples/)
+      - id: check-yaml
+      - id: check-merge-conflict
+      - id: no-commit-to-branch
+        args: [--branch, main]
+      - id: check-added-large-files
+        args: [--maxkb=800]
+      - id: detect-private-key
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.0
+    hooks:
+      - id: gitleaks
+
+  - repo: local
+    hooks:
+      - id: semgrep
+        name: semgrep SAST
+        entry: semgrep scan --config auto --error --quiet
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+
+      - id: biome-check
+        name: biome check
+        entry: npx biome check --write --no-errors-on-unmatched
+        language: system
+        types_or: [javascript, json]
+        exclude: ^(skills/harness-map/assets/|examples/|tests/fixtures/)
+        stages: [pre-commit]
+
+      - id: test-coverage
+        name: tests with coverage thresholds
+        entry: npm run test:coverage
+        language: system
+        pass_filenames: false
+        stages: [pre-push]

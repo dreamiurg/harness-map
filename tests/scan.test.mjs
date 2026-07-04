@@ -1,9 +1,9 @@
-import { test } from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { readFileSync, mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, dirname } from "node:path";
+import { dirname, join } from "node:path";
+import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -57,7 +57,8 @@ test("readList covers every skill, agent, and command file", () => {
     ".claude/agents/helper.md",
     ".claude/commands/deploy.md",
     ".claude/commands/alpha.md",
-  ]) assert.ok(scan.readList.includes(p), `missing ${p}`);
+  ])
+    assert.ok(scan.readList.includes(p), `missing ${p}`);
 });
 
 test("history is null-or-object on the fixture; a real git repo yields strict history", () => {
@@ -70,7 +71,13 @@ test("history is null-or-object on the fixture; a real git repo yields strict hi
   const g = mkdtempSync(join(tmpdir(), "hm-git-"));
   mkdirSync(join(g, ".claude/skills"), { recursive: true });
   writeFileSync(join(g, ".claude/skills/solo.md"), "---\nname: solo\ndescription: d\n---\nbody");
-  const env = { ...process.env, GIT_AUTHOR_NAME: "T", GIT_AUTHOR_EMAIL: "t@t", GIT_COMMITTER_NAME: "T", GIT_COMMITTER_EMAIL: "t@t" };
+  const env = {
+    ...process.env,
+    GIT_AUTHOR_NAME: "T",
+    GIT_AUTHOR_EMAIL: "t@t",
+    GIT_COMMITTER_NAME: "T",
+    GIT_COMMITTER_EMAIL: "t@t",
+  };
   for (const cmd of [["init"], ["add", "."], ["commit", "-m", "x"]])
     execFileSync("git", ["-C", g, ...cmd], { env, encoding: "utf8" });
   const scan2 = runScan(g);

@@ -1,12 +1,15 @@
 #!/usr/bin/env node
 // build.mjs — assemble the self-contained harness-map.html from a validated graph.json.
 // Usage: node build.mjs --graph <file> --out <html-file>
-import { readFileSync, writeFileSync, readdirSync } from "node:fs";
-import { join, resolve, dirname } from "node:path";
+import { readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const argv = process.argv.slice(2);
-const arg = (n, f) => { const i = argv.indexOf(n); return i === -1 ? f : argv[i + 1]; };
+const arg = (n, f) => {
+  const i = argv.indexOf(n);
+  return i === -1 ? f : argv[i + 1];
+};
 const graphFile = resolve(arg("--graph", "harness-map-work/graph.json"));
 const outFile = resolve(arg("--out", "harness-map.html"));
 
@@ -22,7 +25,10 @@ const stats = {
   prompts: g.nodes.filter((n) => n.kind === "prompt").length,
   edges: g.edges.length,
   clusters: (g.clusters || []).length,
-  skillEdges: 0, mcpUses: 0, agentEdges: 0, promptEdges: 0,
+  skillEdges: 0,
+  mcpUses: 0,
+  agentEdges: 0,
+  promptEdges: 0,
 };
 for (const e of g.edges) {
   for (const counter of edgeTypes[e.kind]?.countAs || []) {
@@ -37,7 +43,7 @@ for (const e of g.edges) {
 // bucket so agent-authored graphs that skip clustering still render.
 const DEFAULT_CLUSTER = "Workflows";
 const nodes = g.nodes.map((n) =>
-  n.kind === "workflow" && !n.cluster ? { ...n, cluster: DEFAULT_CLUSTER } : n
+  n.kind === "workflow" && !n.cluster ? { ...n, cluster: DEFAULT_CLUSTER } : n,
 );
 
 // Reconcile deterministically: `clusters` is agent-authored and may drift from
@@ -63,7 +69,10 @@ const b64 = (s) => Buffer.from(s, "utf8").toString("base64");
 const vendorTags = readdirSync(join(assets, "vendor"))
   .filter((f) => f.endsWith(".js"))
   .sort()
-  .map((f) => `<script src="data:application/javascript;base64,${b64(readFileSync(join(assets, "vendor", f), "utf8"))}"></script>`)
+  .map(
+    (f) =>
+      `<script src="data:application/javascript;base64,${b64(readFileSync(join(assets, "vendor", f), "utf8"))}"></script>`,
+  )
   .join("\n");
 
 // JSON is embedded in a <script> block: escape "<" to avoid "</script>" termination.
@@ -82,4 +91,6 @@ replaceOnce("<!--HM:DATA-->", dataTag);
 replaceOnce("<!--HM:RENDERER-->", rendererTag);
 
 writeFileSync(outFile, html);
-console.log(`${outFile}: ${(html.length / 1024).toFixed(0)}KB, ${stats.skills} skills, ${stats.agents} agents, ${stats.mcpServers} mcp, ${stats.edges} edges`);
+console.log(
+  `${outFile}: ${(html.length / 1024).toFixed(0)}KB, ${stats.skills} skills, ${stats.agents} agents, ${stats.mcpServers} mcp, ${stats.edges} edges`,
+);
