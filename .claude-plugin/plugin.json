@@ -7,12 +7,6 @@
     "url": "https://github.com/dreamiurg"
   },
   "repository": "https://github.com/dreamiurg/harness-map",
-  "keywords": [
-    "skills",
-    "agents",
-    "mcp",
-    "visualization",
-    "dependency-map"
-  ],
+  "keywords": ["skills", "agents", "mcp", "visualization", "dependency-map"],
   "license": "MIT"
 }
