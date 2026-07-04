@@ -65,6 +65,9 @@ const clusters = [...(g.clusters || []), ...synthesized];
 const data = { ...g, nodes, edgeTypes, stats, positions: {}, clusters };
 
 // ----- assemble -----
+// Vendor libraries are inlined as base64 data: URIs so the generated map is one
+// self-contained offline file. The inputs are unmodified official npm dist builds —
+// provenance and SHA-256 checksums in assets/vendor/VENDOR.md.
 const b64 = (s) => Buffer.from(s, "utf8").toString("base64");
 const vendorTags = readdirSync(join(assets, "vendor"))
   .filter((f) => f.endsWith(".js"))
