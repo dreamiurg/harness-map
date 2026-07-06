@@ -1,6 +1,6 @@
 {
   "name": "harness-map",
-  "description": "Generate an interactive dependency map of your AI harness (skills, commands, agents, MCP servers)",
+  "description": "Generate an interactive HTML dependency map of your AI harness: skills, slash commands, subagents, and MCP servers with typed, evidence-backed edges for architecture auditing and documentation",
   "version": "1.1.1",
   "author": {
     "name": "Dmytro Gaivoronsky",
@@ -10,9 +10,16 @@
   "keywords": [
     "skills",
     "agents",
+    "subagents",
+    "slash-commands",
     "mcp",
+    "claude-code",
+    "agent-skills",
     "visualization",
-    "dependency-map"
+    "dependency-map",
+    "architecture",
+    "audit",
+    "harness"
   ],
   "license": "MIT"
 }
