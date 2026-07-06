@@ -1,6 +1,6 @@
 {
   "name": "harness-map",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "private": true,
   "type": "module",
   "description": "Agent skill that generates an interactive dependency map of your AI harness",
