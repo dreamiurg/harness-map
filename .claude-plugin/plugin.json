@@ -1,7 +1,7 @@
 {
   "name": "harness-map",
   "description": "Generate an interactive HTML dependency map of your AI harness: skills, slash commands, subagents, and MCP servers with typed, evidence-backed edges for architecture auditing and documentation",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "author": {
     "name": "Dmytro Gaivoronsky",
     "url": "https://github.com/dreamiurg"

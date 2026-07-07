@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/dreamiurg/harness-map/compare/harness-map-v1.1.1...harness-map-v1.2.0) (2026-07-06)
+
+
+### Features
+
+* keyword-rich descriptions and expanded keywords in plugin metadata ([#11](https://github.com/dreamiurg/harness-map/issues/11)) ([e5d5f3a](https://github.com/dreamiurg/harness-map/commit/e5d5f3a532402cf4d3a0f41a52051885d0fc4fb6))
+
 ## [1.1.1](https://github.com/dreamiurg/harness-map/compare/harness-map-v1.1.0...harness-map-v1.1.1) (2026-07-04)
 
 
