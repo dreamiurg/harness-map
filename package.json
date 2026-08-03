@@ -16,7 +16,7 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@biomejs/biome": "^2.5.4",
+    "@biomejs/biome": "^2.5.5",
     "c8": "^11.0.0"
   }
 }
