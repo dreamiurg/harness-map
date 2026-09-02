@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
@@ -84,4 +84,20 @@ test("history is null-or-object on the fixture; a real git repo yields strict hi
   const solo = scan2.nodes.find((n) => n.id === "workflow:solo");
   assert.equal(solo.history.uniqueCommits, 1);
   assert.equal(solo.contributors[0].name, "T");
+});
+
+test("follows symlinked skill dirs and agent files", () => {
+  const repo = mkdtempSync(join(tmpdir(), "hm-symlink-"));
+  mkdirSync(join(repo, "config/skills/linked"), { recursive: true });
+  mkdirSync(join(repo, "config/agents"), { recursive: true });
+  mkdirSync(join(repo, ".claude/skills"), { recursive: true });
+  mkdirSync(join(repo, ".claude/agents"), { recursive: true });
+  writeFileSync(join(repo, "config/skills/linked/SKILL.md"), "---\nname: linked\n---\n");
+  writeFileSync(join(repo, "config/agents/bot.md"), "---\nname: bot\n---\n");
+  symlinkSync("../../config/skills/linked", join(repo, ".claude/skills/linked"));
+  symlinkSync("../../config/agents/bot.md", join(repo, ".claude/agents/bot.md"));
+  const ids = runScan(repo)
+    .nodes.map((n) => n.id)
+    .sort();
+  assert.deepEqual(ids, ["agent:bot", "workflow:linked"]);
 });
