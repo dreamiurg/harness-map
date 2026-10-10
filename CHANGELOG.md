@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/dreamiurg/harness-map/compare/harness-map-v1.2.0...harness-map-v1.2.1) (2026-10-10)
+
+
+### Bug Fixes
+
+* **scan:** follow symlinked skill dirs and agent files ([#23](https://github.com/dreamiurg/harness-map/issues/23)) ([42c4ba3](https://github.com/dreamiurg/harness-map/commit/42c4ba332f0139be16bfa943ad0926d127fc8cd0))
+
 ## [1.2.0](https://github.com/dreamiurg/harness-map/compare/harness-map-v1.1.1...harness-map-v1.2.0) (2026-07-06)
 
 
