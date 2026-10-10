@@ -2,8 +2,15 @@
 // scan.mjs — deterministic discovery of AI-harness surfaces.
 // Usage: node scan.mjs --repo <path> --out <dir>
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
-import { basename, join, resolve } from "node:path";
+import {
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  realpathSync,
+  statSync,
+  writeFileSync,
+} from "node:fs";
+import { basename, join, resolve, sep } from "node:path";
 
 // ---------- CLI ----------
 const argv = process.argv.slice(2);
@@ -12,6 +19,7 @@ function arg(name, fallback) {
   return i === -1 ? fallback : argv[i + 1];
 }
 const repo = resolve(arg("--repo", "."));
+const repoRealPath = realpathSync(repo);
 const outDir = resolve(arg("--out", join(repo, "harness-map-work")));
 mkdirSync(outDir, { recursive: true });
 
@@ -93,12 +101,36 @@ function detectRemote() {
   return "";
 }
 
+// Resolve before discovery and reads so followed symlinks stay inside the repository.
+function repoPath(rel) {
+  try {
+    const path = realpathSync(join(repo, rel));
+    return path === repoRealPath || path.startsWith(`${repoRealPath}${sep}`) ? path : null;
+  } catch {
+    return null;
+  }
+}
 function read(rel) {
-  return readFileSync(join(repo, rel), "utf8");
+  return readFileSync(repoPath(rel), "utf8");
+}
+// stat-based so symlinked skills/agents (e.g. .claude/skills/x -> ../../config/x) are followed.
+function isDir(rel) {
+  try {
+    return statSync(repoPath(rel)).isDirectory();
+  } catch {
+    return false;
+  }
+}
+function isFile(rel) {
+  try {
+    return statSync(repoPath(rel)).isFile();
+  } catch {
+    return false;
+  }
 }
 function listDir(rel) {
   try {
-    return readdirSync(join(repo, rel), { withFileTypes: true });
+    return readdirSync(repoPath(rel), { withFileTypes: true });
   } catch {
     return [];
   }
@@ -120,10 +152,10 @@ for (const dir of SKILL_DIRS) {
   for (const ent of listDir(dir)) {
     let rel = null,
       name = null;
-    if (ent.isDirectory() && existsSync(join(repo, dir, ent.name, "SKILL.md"))) {
+    if (isDir(`${dir}/${ent.name}`) && isFile(`${dir}/${ent.name}/SKILL.md`)) {
       rel = `${dir}/${ent.name}/SKILL.md`;
       name = ent.name;
-    } else if (ent.isFile() && ent.name.endsWith(".md")) {
+    } else if (isFile(`${dir}/${ent.name}`) && ent.name.endsWith(".md")) {
       rel = `${dir}/${ent.name}`;
       name = basename(ent.name, ".md");
     }
@@ -143,11 +175,15 @@ for (const dir of SKILL_DIRS) {
 }
 
 // Commands: .claude/commands/**/*.md — fold into same-named skill, else standalone workflow node.
+const visitedCommands = new Set();
 function walkCommands(rel) {
+  const path = repoPath(rel);
+  if (!path || visitedCommands.has(path)) return;
+  visitedCommands.add(path);
   for (const ent of listDir(rel)) {
     const childRel = `${rel}/${ent.name}`;
-    if (ent.isDirectory()) walkCommands(childRel);
-    else if (ent.name.endsWith(".md")) {
+    if (isDir(childRel)) walkCommands(childRel);
+    else if (ent.name.endsWith(".md") && isFile(childRel)) {
       const name = basename(ent.name, ".md");
       const { attrs } = parseFrontmatter(read(childRel));
       const cmd = { name, description: attrs.description || "", path: childRel };
@@ -177,8 +213,8 @@ walkCommands(".claude/commands");
 
 // Agents: .claude/agents/*.md
 for (const ent of listDir(".claude/agents")) {
-  if (!ent.isFile() || !ent.name.endsWith(".md")) continue;
   const rel = `.claude/agents/${ent.name}`;
+  if (!isFile(rel) || !ent.name.endsWith(".md")) continue;
   const name = basename(ent.name, ".md");
   const { attrs } = parseFrontmatter(read(rel));
   addNode(
@@ -196,7 +232,7 @@ for (const ent of listDir(".claude/agents")) {
 }
 
 // MCP servers: .mcp.json
-if (existsSync(join(repo, ".mcp.json"))) {
+if (isFile(".mcp.json")) {
   let servers = {};
   try {
     servers = JSON.parse(read(".mcp.json")).mcpServers || {};

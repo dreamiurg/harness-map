@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
@@ -12,7 +12,10 @@ const MINI = join(here, "fixtures/mini-repo");
 
 function runScan(repo) {
   const out = mkdtempSync(join(tmpdir(), "hm-scan-"));
-  execFileSync(process.execPath, [SCAN, "--repo", repo, "--out", out], { encoding: "utf8" });
+  execFileSync(process.execPath, [SCAN, "--repo", repo, "--out", out], {
+    encoding: "utf8",
+    timeout: 5000,
+  });
   return JSON.parse(readFileSync(join(out, "scan.json"), "utf8"));
 }
 
@@ -84,4 +87,87 @@ test("history is null-or-object on the fixture; a real git repo yields strict hi
   const solo = scan2.nodes.find((n) => n.id === "workflow:solo");
   assert.equal(solo.history.uniqueCommits, 1);
   assert.equal(solo.contributors[0].name, "T");
+});
+
+test("follows symlinked skill dirs and agent files", () => {
+  const repo = mkdtempSync(join(tmpdir(), "hm-symlink-"));
+  mkdirSync(join(repo, "config/skills/linked"), { recursive: true });
+  mkdirSync(join(repo, "config/agents"), { recursive: true });
+  mkdirSync(join(repo, ".claude/skills"), { recursive: true });
+  mkdirSync(join(repo, ".claude/agents"), { recursive: true });
+  writeFileSync(join(repo, "config/skills/linked/SKILL.md"), "---\nname: linked\n---\n");
+  writeFileSync(join(repo, "config/agents/bot.md"), "---\nname: bot\n---\n");
+  symlinkSync("../../config/skills/linked", join(repo, ".claude/skills/linked"));
+  symlinkSync("../../config/agents/bot.md", join(repo, ".claude/agents/bot.md"));
+  const scan = runScan(repo);
+  const ids = scan.nodes.map((n) => n.id).sort();
+  assert.deepEqual(ids, ["agent:bot", "workflow:linked"]);
+  assert.deepEqual(scan.readList.sort(), [
+    ".claude/agents/bot.md",
+    ".claude/skills/linked/SKILL.md",
+  ]);
+});
+
+test("rejects symlinks outside the repository across discovery surfaces", () => {
+  const repo = mkdtempSync(join(tmpdir(), "hm-boundary-"));
+  const outside = `${repo}-outside`;
+  for (const dir of [".claude/skills/local", ".claude/agents", ".claude/commands", ".agents"]) {
+    mkdirSync(join(repo, dir), { recursive: true });
+  }
+  mkdirSync(join(outside, "external"), { recursive: true });
+  writeFileSync(join(outside, "external/SKILL.md"), "---\ndescription: external\n---\n");
+  writeFileSync(join(outside, "bot.md"), "---\ndescription: external\n---\n");
+  writeFileSync(join(outside, "mcp.json"), '{"mcpServers":{"external":{}}}');
+  for (const [target, link] of [
+    ["external", ".claude/skills/external"],
+    ["bot.md", ".claude/skills/flat.md"],
+    ["bot.md", ".claude/skills/local/SKILL.md"],
+    ["bot.md", ".claude/agents/bot.md"],
+    ["bot.md", ".claude/commands/bot.md"],
+    ["external", ".claude/commands/external"],
+    ["external", ".agents/skills"],
+    ["mcp.json", ".mcp.json"],
+  ]) {
+    symlinkSync(join(outside, target), join(repo, link));
+  }
+  const scan = runScan(repo);
+  assert.deepEqual(scan.nodes, []);
+  assert.deepEqual(scan.readList, []);
+});
+
+test("visits symlinked command directories once and skips cycles", () => {
+  const repo = mkdtempSync(join(tmpdir(), "hm-cycle-"));
+  mkdirSync(join(repo, ".claude/commands"), { recursive: true });
+  mkdirSync(join(repo, "config/commands"), { recursive: true });
+  writeFileSync(join(repo, "config/commands/deploy.md"), "---\ndescription: deploy\n---\n");
+  symlinkSync("../../config/commands", join(repo, ".claude/commands/linked"));
+  symlinkSync("../../config/commands", join(repo, ".claude/commands/alias"));
+  symlinkSync(".", join(repo, "config/commands/loop"));
+  const scan = runScan(repo);
+  assert.deepEqual(
+    scan.nodes.map((n) => n.id),
+    ["workflow:deploy"],
+  );
+  assert.equal(scan.nodes[0].commands.length, 1);
+  assert.equal(scan.readList.length, 1);
+  assert.match(scan.readList[0], /^\.claude\/commands\/(alias|linked)\/deploy\.md$/);
+});
+
+test("skips dangling links and non-files when scanning a symlinked repository root", () => {
+  const repo = mkdtempSync(join(tmpdir(), "hm-dangling-"));
+  mkdirSync(join(repo, ".claude/skills/not-a-file/SKILL.md"), { recursive: true });
+  mkdirSync(join(repo, ".claude/agents"), { recursive: true });
+  mkdirSync(join(repo, ".claude/commands"), { recursive: true });
+  for (const dir of ["skills", "agents", "commands"]) {
+    symlinkSync("missing", join(repo, `.claude/${dir}/broken.md`));
+  }
+  writeFileSync(join(repo, ".claude/skills/valid.md"), "---\ndescription: valid\n---\n");
+  const alias = `${repo}-alias`;
+  symlinkSync(repo, alias);
+  const scan = runScan(alias);
+  assert.deepEqual(
+    scan.nodes.map((n) => n.id),
+    ["workflow:valid"],
+  );
+  assert.deepEqual(scan.readList, [".claude/skills/valid.md"]);
 });
