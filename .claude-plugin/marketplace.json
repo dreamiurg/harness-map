@@ -1,12 +1,12 @@
 {
   "name": "harness-map-marketplace",
-  "description": "Visualize your AI harness architecture with an interactive dependency map of skills, commands, agents, and MCP servers",
+  "description": "Visualize your Claude Code and AI agent harness architecture: an interactive HTML dependency map of skills, slash commands, subagents, and MCP servers with evidence-backed edges for auditing and documentation",
   "owner": { "name": "Dmytro Gaivoronsky" },
   "plugins": [
     {
       "name": "harness-map",
       "source": "./",
-      "description": "Interactive dependency map of your AI harness"
+      "description": "Interactive HTML dependency map of your AI harness: skills, slash commands, subagents, and MCP servers with evidence-backed dependency edges"
     }
   ]
 }
