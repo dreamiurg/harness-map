@@ -57,6 +57,11 @@ this up, do this — verified to work on a clean machine with only Node ≥ 20 a
    notable findings (orphan skills, the most-depended-on agent, unused MCP servers).
    Delete `harness-map-work/` or gitignore it — only the HTML is the deliverable.
 
+## Development
+
+Coverage tooling requires Node.js 20.19+, 22.12+, or 23+; the standalone scripts support Node.js 20+.
+Run `npm ci` and `npm run ci` to install development tools and check lint, tests, and coverage.
+
 ## License
 
 MIT
