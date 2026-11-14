@@ -9,6 +9,8 @@ An [Agent Skill](https://agentskills.io) that generates a **self-contained, inte
 dependency map** of a repository's AI harness: skills, commands, agents, and MCP servers —
 which skills hand off to which, which agents they delegate to, which MCP servers everything uses.
 
+Why I built it and what it found in my own setup: [Mapping my AI harness](https://dreamiurg.net/2026/07/05/mapping-my-ai-harness.html).
+
 ![Example: superpowers harness map](examples/superpowers.png)
 
 *(Generated from the public [obra/superpowers](https://github.com/obra/superpowers) repo —
